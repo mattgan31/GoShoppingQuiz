@@ -43,7 +43,6 @@ const closeOrder = async (req, res) => {
     }
 
     if (userId != order.userId) {
-        console.log();
         return res.status(401).json({
             error: 'Unavailable'
         });
@@ -51,7 +50,7 @@ const closeOrder = async (req, res) => {
 
     const update = await req.context.models.orders.update({ status: "CLOSE" }, { where: { orderId } });
     if (update) {
-        return res.json({ message: `Order with ${orderId} status changed to CLOSE` });
+        return res.json({ message: `Order with ${orderId} ID, status changed to CLOSE` });
     }
 }
 
@@ -76,11 +75,9 @@ const cancelOrder = async (req, res) => {
           },
         ],
       });
-console.log();
 
     // return res.json({ order });
     if (order.status != "OPEN") {
-        console.log();
         return res.status(401).json({ error: "Order has not OPEN" });
     }
 
@@ -89,14 +86,15 @@ console.log();
         const product = await req.context.models.product.findOne({ where: { prodId } });
 
         const newStock = product.stock + qty;
-        console.log();
         await req.context.models.product.update({stock: newStock}, {
             where:{prodId: product.prodId}
         })
     }
 
     const updateOrder = await req.context.models.orders.update({ status: "Cancelled" }, { where: { orderId } });
-    return res.json({ order: updateOrder });
+    if (updateOrder) {
+        return res.json({ message: `Order with ${orderId} ID, status changed to Cancelled` });
+    }
 }
 
 export default {
